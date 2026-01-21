@@ -11,30 +11,6 @@ PORT = os.environ['PORT']
 PASSWD = os.environ['PASSWD']
 SCRAPING = (int)(os.environ['SCRAPING'])
 
-def get_periodictask(cur):
-    try:
-        # Execute a SELECT statement
-        cur.execute("SELECT last_run_at FROM django_celery_beat_periodictask WHERE task = 'DataRetentionTask'")
-
-        # Fetch all the rows from the cursor
-        rows = cur.fetchall()
-        print("[INFO] GET PERIODIC TASKS",rows)
-        # Convert rows to a list of dictionaries
-        records = []
-        for row in rows:
-            record = {}
-            for i, column in enumerate(cur.description):
-                value = row[i]
-                if isinstance(value, datetime):
-                    # Convert to Unix timestamp in seconds
-                    value = int(value.replace(tzinfo=timezone.utc).timestamp())
-                record[column.name] = value
-            records.append(record)
-        return records
-    except psycopg2.Error as e:
-        print("Error executing SELECT statement:", e)
-        return 0
-
 def get_active_connections(cur):
     try:
         cur.execute(f"SELECT count(*) AS active_connections FROM pg_stat_activity WHERE datname='{DBNAME}'")
@@ -80,7 +56,6 @@ def run_exporter():
     while(True):
         cur = connection_db().cursor()
         output = {
-            "django_celery_beat_periodictask": get_periodictask(cur),
             "active_connections": get_active_connections(cur),
             "cache_hit": get_cache_hit(cur),
             "db_size": get_db_size(cur)
