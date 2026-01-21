@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgsql-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgsql-exporter
+  template:
+    metadata:
+      labels:
+        app: pgsql-exporter
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: pgsql-exporter
+          image: pgsql-exporter:1.0
+          env:
+            - name: DBNAME
+              value: "test"
+            - name: USER
+              value: "test"
+            - name: PORT
+              value: "5432"
+            - name: PASSWD
+              value: "test"
+            - name: HOST
+              value: "test"
+            - name: SCRAPING
+              value: "60" #time in seconds
+          ports:
+            - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgsql-exporter
+  namespace: monitoring
+spec:
+  type: ClusterIP
+  selector:
+    app: pgsql-exporter
+  ports:
+    - port: 8080
+      targetPort: 8080
