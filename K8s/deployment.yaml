@@ -13,8 +13,7 @@ spec:
       labels:
         app: pgsql-exporter
     spec:
-      imagePullSecrets:
-        - name: regcred
+      imagePullSecrets[]
       containers:
         - name: pgsql-exporter
           image: pgsql-exporter:1.0
