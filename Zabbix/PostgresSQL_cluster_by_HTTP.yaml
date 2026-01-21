@@ -10,26 +10,6 @@ zabbix_export:
       groups:
         - name: Templates/Applications
       items:
-        - uuid: 9007e45e85644a9789703cbffa253407
-          name: 'PGSQL Django PeriodicTask'
-          type: HTTP_AGENT
-          key: last_execution
-          trends: '0'
-          description: 'last execution of the periodic task'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.django_celery_beat_periodictask.[0].last_run_at'
-          url: 'http://127.0.0.1:8080/metrics'
-          triggers:
-            - uuid: e1b011080c7148ac9987df44d50762ae
-              expression: 'nodata(/PostgresSQL cluster by HTTP/last_execution, 720)'
-              name: 'Periodic Task "DataRetentionTask" is disabled'
-              priority: AVERAGE
-            - uuid: 43486819927c4de5966225a7c9960c11
-              expression: 'last(/PostgresSQL cluster by HTTP/last_execution) < (time() - 720)'
-              name: 'Periodic Task “DataRetentionTask” not running for too long'
-              priority: HIGH
         - uuid: 3984741c888a4a708ce0c71a826f6174
           name: 'PGSQL Active Connections'
           type: HTTP_AGENT
